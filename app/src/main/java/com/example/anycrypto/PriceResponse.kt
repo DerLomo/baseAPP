@@ -1,4 +1,4 @@
-package com.example.tnd
+package com.tnd.anycrypto
 
 data class PriceResponse(
     val data: Map<String, TokenInfo>

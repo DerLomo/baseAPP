@@ -1,4 +1,4 @@
-package com.example.tnd
+package com.tnd.anycrypto
 
 data class SwapRequest(
     val userPublicKey: String,

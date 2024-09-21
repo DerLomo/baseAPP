@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "718887359013",
-    "project_id": "tnd-pay",
-    "storage_bucket": "tnd-pay.appspot.com"
+    "project_number": "777977780192",
+    "project_id": "anycrypto-ff0ff",
+    "storage_bucket": "anycrypto-ff0ff.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:718887359013:android:2c5a60d7c3daadcbf6e5cc",
+        "mobilesdk_app_id": "1:777977780192:android:42ce9729e31405415f3d85",
         "android_client_info": {
-          "package_name": "com.tnd.tnd"
+          "package_name": "com.tnd.anycrypto"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAQ4yyyZf_zBCwtbXfzCNOmoxymFZ-gCXs"
+          "current_key": "AIzaSyBGNM9kCSptxRS5eBYpzjibyEkC18-cBgk"
         }
       ],
       "services": {

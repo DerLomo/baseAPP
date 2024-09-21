@@ -1,4 +1,4 @@
-package com.example.tnd
+package com.tnd.anycrypto
 class XMRUtils {
     companion object {
         private val rpcService = RpcService()

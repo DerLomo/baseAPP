@@ -1,5 +1,5 @@
 // CryptoCompareApi.kt
-package com.example.tnd
+package com.tnd.anycrypto
 
 import retrofit2.Call
 import retrofit2.http.GET

@@ -16,7 +16,7 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.tnd"
+    namespace = "com.tnd.anycrypto"
     compileSdk = 34
     buildFeatures {
         buildConfig = true
@@ -30,7 +30,7 @@ android {
         }
     }
     defaultConfig {
-        applicationId = "com.tnd.tnd"
+        applicationId = "com.tnd.anycrypto"
         minSdk = 28
         targetSdk = 34
         versionCode = 4

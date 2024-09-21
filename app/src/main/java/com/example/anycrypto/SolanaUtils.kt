@@ -1,21 +1,11 @@
-package com.example.tnd
+package com.tnd.anycrypto
 
-import android.app.AlertDialog
-import android.content.Context
 import android.util.Log
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.solana.core.PublicKey
 import com.solana.programs.TokenProgram
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.*
+
 class SolanaUtils {
     companion object {
 

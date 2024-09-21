@@ -1,10 +1,10 @@
-package com.example.tnd
+package com.tnd.anycrypto
 
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
-import com.example.tnd.databinding.ActivityAddStoreBinding
+import com.tnd.anycrypto.databinding.ActivityAddStoreBinding
 import android.widget.Toast
 import com.google.firebase.firestore.FirebaseFirestore
 

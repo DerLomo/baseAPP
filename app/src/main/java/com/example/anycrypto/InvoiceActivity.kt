@@ -1,4 +1,4 @@
-package com.example.tnd
+package com.tnd.anycrypto
 
 import android.app.Activity
 import android.app.PendingIntent
@@ -18,7 +18,7 @@ import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import android.util.Log
-import com.example.tnd.SetPreferencesActivity.Preferences
+import com.tnd.anycrypto.SetPreferencesActivity.Preferences
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputLayout
 

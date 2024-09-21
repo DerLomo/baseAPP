@@ -1,5 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/ic_launcher_background"/>
-    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
-</adaptive-icon>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <path
+        android:fillColor="#001933"
+        android:pathData="M0,0h100v100h-100z" />
+
+    <path
+        android:strokeColor="#00FFFF"
+        android:strokeWidth="2"
+        android:pathData="M50,5 A45,45 0 0,1 50,95 A45,45 0 0,1 50,5" />
+
+    <group
+        android:pivotX="50"
+        android:pivotY="50"
+        android:scaleX="0.8"
+        android:scaleY="0.8">
+        <path
+            android:fillColor="#00FFFF"
+            android:pathData="M50,10 Q65,35 50,60 Q35,35 50,10" />
+        <path
+            android:fillColor="#00FFFF"
+            android:pathData="M50,10 Q65,35 50,60 Q35,35 50,10"
+            android:rotation="72" />
+        <path
+            android:fillColor="#00FFFF"
+            android:pathData="M50,10 Q65,35 50,60 Q35,35 50,10"
+            android:rotation="144" />
+        <path
+            android:fillColor="#00FFFF"
+            android:pathData="M50,10 Q65,35 50,60 Q35,35 50,10"
+            android:rotation="216" />
+        <path
+            android:fillColor="#00FFFF"
+            android:pathData="M50,10 Q65,35 50,60 Q35,35 50,10"
+            android:rotation="288" />
+    </group>
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,50m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+</vector>

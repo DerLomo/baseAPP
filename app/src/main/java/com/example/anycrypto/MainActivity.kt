@@ -1,4 +1,4 @@
-    package com.example.tnd
+    package com.tnd.anycrypto
 
     import android.content.Context
     import android.content.Intent
@@ -48,7 +48,7 @@
     import com.solana.mobilewalletadapter.clientlib.ConnectionIdentity
     import com.solana.mobilewalletadapter.clientlib.Solana
     import androidx.cardview.widget.CardView
-    import com.example.tnd.SetPreferencesActivity.Preferences
+    import com.tnd.anycrypto.SetPreferencesActivity.Preferences
     import com.google.firebase.analytics.FirebaseAnalytics
     import com.google.firebase.analytics.ktx.analytics
     import com.google.firebase.ktx.Firebase

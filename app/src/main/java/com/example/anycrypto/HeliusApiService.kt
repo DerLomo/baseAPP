@@ -1,4 +1,4 @@
-package com.example.tnd
+package com.tnd.anycrypto
 
 import retrofit2.http.Body
 import retrofit2.http.POST

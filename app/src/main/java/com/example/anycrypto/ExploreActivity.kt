@@ -1,4 +1,4 @@
-package com.example.tnd
+package com.tnd.anycrypto
 
 import android.Manifest
 import android.content.Intent
@@ -15,9 +15,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.tnd.databinding.ActivityExploreBinding
+import com.tnd.anycrypto.databinding.ActivityExploreBinding
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.tnd.anycrypto.AddStoreActivity
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.osmdroid.config.Configuration

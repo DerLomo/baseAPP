@@ -16,5 +16,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TND"
+rootProject.name = "AnyCrypto"
 include(":app")

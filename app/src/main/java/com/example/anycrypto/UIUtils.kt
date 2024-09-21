@@ -1,4 +1,4 @@
-package com.example.tnd
+package com.tnd.anycrypto
 
 import android.nfc.NfcAdapter
 import android.view.View

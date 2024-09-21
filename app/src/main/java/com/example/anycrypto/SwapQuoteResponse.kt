@@ -1,4 +1,4 @@
-package com.example.tnd
+package com.tnd.anycrypto
 
 import com.google.gson.annotations.SerializedName
 
