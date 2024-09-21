@@ -9,8 +9,8 @@ import io.metamask.androidsdk.EthereumRequest
 
 class EVMUtils(context: Context) {
     private val dappMetadata = DappMetadata("AnyCrypto", "https://www.anycrypto.com")
-    private val infuraAPIKey = "3a2cee4ee80f4387a1f2e10b0b0caaf5" // Replace with your actual Infura API key
-    private val readonlyRPCMap = emptyMap<String, String>() // Empty map if you don't need specific RPCs
+    private val infuraAPIKey = "3a2cee4ee80f4387a1f2e10b0b0caaf5"
+    private val readonlyRPCMap = emptyMap<String, String>()
 
     val ethereum = Ethereum(context, dappMetadata, SDKOptions(infuraAPIKey, readonlyRPCMap))
 
@@ -38,6 +38,24 @@ class EVMUtils(context: Context) {
                 }
             }
         }
+    }
+
+    fun sendUSDC(toAddress: String, amount: Double, callback: (Result<String>) -> Unit) {
+        val from = ethereum.selectedAddress
+        // USDC contract address (this is for Ethereum mainnet, change if using a different network)
+        val usdcContractAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+
+        // Encode the transfer function call
+        val data = "0xa9059cbb" + // Method ID for "transfer(address,uint256)"
+                toAddress.substring(2).padStart(64, '0') + // Recipient address
+                amount.toString().padStart(64, '0') // Amount in hex
+
+        val transactionParams = mapOf(
+            "from" to from,
+            "to" to usdcContractAddress,
+            "data" to data
+        )
+
     }
 
     data class MetaMaskConnection(

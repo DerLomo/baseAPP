@@ -324,11 +324,6 @@ class InvoiceActivity : Activity() {
                 }
                 Log.d("InvoiceActivity", "Using Solana")
             }
-            "XMR" -> {
-                XMRUtils.getXMRPriceInUSD { price ->
-                    callback(price)
-                }
-            }
             else -> callback(null)
         }
     }
