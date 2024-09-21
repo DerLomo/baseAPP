@@ -31,9 +31,9 @@ class HistoryActivity : AppCompatActivity() {
         return listOf(
             PaymentHistoryItem("Gusto's Gourmet Pizzeria", 25.0, "2023-06-01", "9xTQPW9sPByQHZPH4rTggwr2DXGVVEGETQmDUAT8fKK5", R.drawable.token1_logo),
             PaymentHistoryItem("Scoops & Smiles Ice Cream Parlor", 10.0, "2023-06-02", "4YkUQFLthRZrYtmYTTG6RfRSzBRhY6vGdVfhm2J9Ywtz", R.drawable.token1_logo),
-            PaymentHistoryItem("Perky's Fresh Brew Coffee House", 5.0, "2023-06-03", "6RHhN6CtGZEVJak3xhLZ8X9Qv1zLpFXj2VTQDUPiGKQV", R.drawable.token2_logo),
+            PaymentHistoryItem("Perky's Fresh Brew Coffee House", 5.0, "2023-06-03", "6RHhN6CtGZEVJak3xhLZ8X9Qv1zLpFXj2VTQDUPiGKQV", R.drawable.token1_logo),
             PaymentHistoryItem("Bunzilla's Gourmet Burgers", 15.0, "2023-06-04", "FkYd9ZLgh6feCSWXHpzt7jJcFimKFbwiSAF2VYcj8HUQ", R.drawable.bonk),
-            PaymentHistoryItem("Sakura Sushi Haven", 30.0, "2023-06-05", "8KSEQ2Yt9ogNBPNXLc1VQbm5jxQJq2YdqphvJh7tyzfA", R.drawable.token2_logo),
+            PaymentHistoryItem("Sakura Sushi Haven", 30.0, "2023-06-05", "8KSEQ2Yt9ogNBPNXLc1VQbm5jxQJq2YdqphvJh7tyzfA", R.drawable.token1_logo),
             PaymentHistoryItem("Taco Fiesta Mexican Grill", 12.5, "2023-06-06", "3Ai2vRvE2E3XmfSjZNbBz1rYYJcMnU8vnfGmD6RtYQtN", R.drawable.token1_logo),
             PaymentHistoryItem("Noodle Ninja Asian Fusion", 22.0, "2023-06-08", "7CZpF3ywFTxPMXJByAn8tWQDpG2RsHJh4KinHdZaGz1e", R.drawable.bonk)
         )

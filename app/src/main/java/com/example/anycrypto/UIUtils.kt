@@ -28,27 +28,16 @@ class UIUtils {
             val addressCard = cardLayout.findViewById<TextView>(R.id.addressTextView)
 
             when (connectedNetwork) {
-                "Solana" -> {
-                    cardBackground.setBackgroundResource(R.drawable.card_background)
-                    chainLogoImageView.setImageResource(R.drawable.token1_logo)
-                    metamaskImageView.visibility = View.GONE
-                    addressCard.text = Utils.shortenAddress(address)
-                }
-                "Polygon" -> {
+                "0x89" -> {
                     cardBackground.setBackgroundResource(R.drawable.card_background_polygon)
                     chainLogoImageView.setImageResource(R.drawable.polygon)
                     metamaskImageView.visibility = View.VISIBLE
                     addressCard.text = Utils.shortenAddress(address)
                 }
-                "ETH" -> {
+                "0x1" -> {
                     cardBackground.setBackgroundResource(R.drawable.card_background_eth)
                     chainLogoImageView.setImageResource(R.drawable.eth)
                     metamaskImageView.visibility = View.VISIBLE
-                    addressCard.text = Utils.shortenAddress(address)
-                }
-                "XMR" -> {
-                    cardBackground.setBackgroundResource(R.drawable.card_background_xmr)
-                    chainLogoImageView.setImageResource(R.drawable.xmr_logo)
                     addressCard.text = Utils.shortenAddress(address)
                 }
             }

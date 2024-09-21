@@ -54,6 +54,7 @@
     import com.google.firebase.ktx.Firebase
 
     class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
+        private lateinit var evmUtils: EVMUtils
         private lateinit var textView: TextView
         private lateinit var connectWalletButton: Button
         private lateinit var PayButton: Button
@@ -87,6 +88,10 @@
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_main)
             activityResultSender = ActivityResultSender(this)
+
+            //metamask
+            evmUtils = EVMUtils(this)
+
 
             textView = findViewById(R.id.textView)
             connectWalletButton = findViewById(R.id.connectWalletButton)
@@ -174,8 +179,8 @@
                                                 Log.d("MainActivity", "DIFFERENT ID S ")
                                                 // If user have chosen other token we have to swap
                                                 // Find the selected token to get the number of decimals and mint address
-                                                val tokenIn = TokenData.tokenList_sol.find { it.id == idSpinner }
-                                                val tokenOut = TokenData.tokenList_sol.find { it.id == id }
+                                                val tokenIn = TokenData.tokenList.find { it.id == idSpinner }
+                                                val tokenOut = TokenData.tokenList.find { it.id == id }
                                                 // Perform the conversion only if both tokens are found
                                                 if (tokenIn != null && tokenOut != null) {
                                                     // Convert the amount from Double to Long based on the token's decimals
@@ -209,9 +214,7 @@
             updateButton()
             val navigationView: NavigationView = findViewById(R.id.nav_view)
             val menu = navigationView.menu
-            val versionItem = menu.findItem(R.id.nav_version)
             val versionName = BuildConfig.VERSION_NAME
-            versionItem.title = "Version $versionName"
             navigationView.setNavigationItemSelectedListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.nav_connect_wallet -> {
@@ -230,35 +233,6 @@
                         drawerLayout.closeDrawer(GravityCompat.START)
                         true
                     }
-                    //R.id.nav_pay_hist -> {
-                        //val intent = Intent(this@MainActivity, HistoryActivity::class.java)
-                        //startActivity(intent)
-                        //drawerLayout.closeDrawer(GravityCompat.START)
-                        //true
-                    //}
-                    R.id.nav_twitter -> {
-                        // Handle Twitter option by opening the Twitter URL
-                        Utils.openWebPage(this,"https://twitter.com/TNDpayments")
-                        drawerLayout.closeDrawer(GravityCompat.START)
-                        true
-                    }
-                    R.id.nav_telegram -> {
-                        // Handle Twitter option by opening the Twitter URL
-                        Utils.openWebPage(this,"https://t.me/tndpayments")
-                        drawerLayout.closeDrawer(GravityCompat.START)
-                        true
-                    }
-                    R.id.nav_website -> {
-                        // Handle Website option by opening the website URL
-                        Utils.openWebPage(this,"https://www.tndpayments.com/")
-                        drawerLayout.closeDrawer(GravityCompat.START)
-                        true
-                    }
-                    R.id.nav_explore_form ->{
-                        Utils.openWebPage(this,"https://github.com/TNDpay/vendors/blob/main/user_license.MD")
-                        drawerLayout.closeDrawer(GravityCompat.START)
-                        true
-                    }
                     else -> false
                 }
             }
@@ -268,18 +242,18 @@
                 decline()
             }
 
-            val tokenAdapter = if (connectedNetwork == "Solana") {
-                TokenAdapter(this, TokenData.tokenList_sol)
-            } else if (connectedNetwork == "XMR") {
-                TokenAdapter(this, TokenData.tokenList_xmr)
+            val tokenAdapter = if (connectedNetwork == "0x89") {
+                TokenAdapter(this, TokenData.tokenList)
+            } else if (connectedNetwork == "0x1") {
+                TokenAdapter(this, TokenData.tokenList)
             } else {
                 // Handle other cases or provide a default
-                TokenAdapter(this, TokenData.tokenList_sol)
+                TokenAdapter(this, TokenData.tokenList)
             }
             spinnerToken.adapter = tokenAdapter
             // Set the default token for payments
             val defaultPaymentTokenId = Preferences.getDefaultPaymentTokenId(this)
-            val defaultPaymentToken = TokenData.tokenList_sol.find { it.id == defaultPaymentTokenId }
+            val defaultPaymentToken = TokenData.tokenList.find { it.id == defaultPaymentTokenId }
             defaultPaymentToken?.let {
                 spinnerToken.setSelection(tokenAdapter.getPosition(it))
             }
@@ -504,10 +478,10 @@
         }
         private fun updateTokenList(context: Context, connectedNetwork:String) {
             Log.d("MainActivity",connectedNetwork)
-            val tokenAdapter = if (connectedNetwork == "Solana") {
-                TokenAdapter(context, TokenData.tokenList_sol)
+            val tokenAdapter = if (connectedNetwork == "0x89") {
+                TokenAdapter(context, TokenData.tokenList)
             } else {
-                TokenAdapter(context, TokenData.tokenList_polygon)
+                TokenAdapter(context, TokenData.tokenList)
             }
             spinnerToken.adapter = tokenAdapter
         }
@@ -535,137 +509,39 @@
 
 
         private fun connectWallet() {
-            // Create an AlertDialog to prompt the user to choose the wallet type
-            connectSolanaWallet2()
-            //TODO: Use walletconnect instead of MetaMask api
+            evmUtils.connectMetaMask { result ->
+                runOnUiThread {
+                    result.fold(
+                        onSuccess = { connection ->
+                            userAddress = connection.address
+                            connectedNetwork = connection.chainId
 
-            //val walletOptions = arrayOf("Solana Wallet", "MetaMask (ONLY POLYGON)")
-            //AlertDialog.Builder(this)
-            //    .setTitle("Select Wallet Type")
-            //    .setItems(walletOptions) { _, which ->
-            //        when (which) {
-            //            0 -> connectSolanaWallet()
-            //            1 -> showMetaMaskWarningDialog()
-            //        }
-            //    }
-            //    .show()
-        }
-        private fun connectSolanaWallet2() {
-            scope.launch {
-                try {
-                    walletAdapter.blockchain = Solana.Mainnet
-                    val result = walletAdapter.connect(activityResultSender)
+                            // Store auth data
+                            storeAuthData("", userAddress, connectedNetwork)
 
-                    when (result) {
-                        is TransactionResult.Success -> {
-                            val authResult = result.authResult
-                            Log.e("MainActivity", "auth result IS THIS : $authResult")
+                            // Update UI
+                            UIUtils.updateCardUI(this@MainActivity, userAddress, connectedNetwork)
+                            connectWalletButton.visibility = View.GONE
+                            updateButton()
+                            updateUserAddressUI(userAddress)
+                            cardLayout.visibility = View.VISIBLE
+                            updateTokenList(this@MainActivity, connectedNetwork)
 
-                            userAddress = authResult.accounts.firstOrNull()?.publicKey?.let {
-                                Base58.encode(it)
-                            } ?: run {
-                                Log.e("MainActivity", "No account returned from wallet")
-                                return@launch
-                            }
-
-                            authToken = authResult.authToken
-                            canTransact = true
-
-                            Log.d("MainActivity", "Connected to Solana Wallet: $userAddress")
-                            connectedNetwork = "Solana"
-
-                            storeAuthData(authToken, userAddress, connectedNetwork)
-
-                            withContext(Dispatchers.Main) {
-                                UIUtils.updateCardUI(this@MainActivity, userAddress, connectedNetwork)
-                                connectWalletButton.visibility = View.GONE
-                                updateButton()
-                                updateUserAddressUI(userAddress)
-                                cardLayout.visibility = View.VISIBLE
-                                updateTokenList(this@MainActivity, connectedNetwork)
-                            }
-
+                            // Update navigation menu
                             val navigationView: NavigationView = findViewById(R.id.nav_view)
                             updateMenuItemsVisibility(navigationView)
-                            firebaseAnalytics.logEvent("wallet_connected", null)
+
+
+                            Toast.makeText(this@MainActivity, "Connected to MetaMask: $userAddress on chain ${connection.chainId}", Toast.LENGTH_LONG).show()
+                            Log.d("MainActivity", "Connected to MetaMask: $userAddress on chain ${connection.chainId}")
+                        },
+                        onFailure = { error ->
+                            Toast.makeText(this@MainActivity, "Failed to connect to MetaMask: ${error.message}", Toast.LENGTH_LONG).show()
+                            Log.e("MainActivity", "Failed to connect to MetaMask: ${error.message}", error)
                         }
-                        is TransactionResult.NoWalletFound -> {
-                            Log.e("MainActivity", "No wallet found")
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(this@MainActivity, "No wallet found", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        is TransactionResult.Failure -> {
-                            Log.e("MainActivity", "Connection failed: ${result}")
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(this@MainActivity, "Connection failed", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e("MainActivity", "Error connecting to Solana Wallet: ${e.message}")
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@MainActivity, "Error connecting to wallet", Toast.LENGTH_SHORT).show()
-                    }
+                    )
                 }
             }
-        }
-        private fun connectSolanaWallet() {
-            scope.launch {
-                try {
-                    chain="solana:mainnet"
-                    walletAdapter.blockchain = Solana.Mainnet
-                    val result = walletAdapter.transact(activityResultSender) {
-                        authorize(identityUri, iconUri, identityName, chain )
-                    }
-                    Log.e("Mainactivity","result is ${result}")
-                    when (result) {
-                        is TransactionResult.Success -> {
-                            val authResult = result.payload
-                            userAddress = authResult.accounts.firstOrNull()?.publicKey?.let {
-                                Base58.encode(it)
-                            } ?: run {
-                                Log.e("MainActivity", "No account returned from wallet")
-                                return@launch
-                            }
-                            authToken = authResult.authToken
-                            canTransact = true
-
-                            Log.d("MainActivity", "Connected to Solana Wallet: $userAddress")
-                            connectedNetwork = "Solana"
-
-                            storeAuthData(authToken, userAddress, connectedNetwork)
-
-                            withContext(Dispatchers.Main) {
-                                UIUtils.updateCardUI(this@MainActivity, userAddress, connectedNetwork)
-                                connectWalletButton.visibility = View.GONE
-                                updateButton()
-                                updateUserAddressUI(userAddress)
-                                cardLayout.visibility = View.VISIBLE
-                                updateTokenList(this@MainActivity, connectedNetwork)
-                            }
-
-                            val navigationView: NavigationView = findViewById(R.id.nav_view)
-                            updateMenuItemsVisibility(navigationView)
-                        }
-                        is TransactionResult.NoWalletFound -> {
-                            // Handle no wallet found case
-                        }
-                        is TransactionResult.Failure -> {
-                            // Handle failure case
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e("MainActivity", "Error connecting to Solana Wallet: ${e.message}")
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@MainActivity, "Error connecting to wallet", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
-
-        companion object {
-            private const val TAG = "MainActivity"
         }
 
         private fun disconnectWallet() {
@@ -766,7 +642,7 @@
             // Reload default payment token
             val defaultPaymentTokenId = SetPreferencesActivity.Preferences.getDefaultPaymentTokenId(this)
             val tokenAdapter = spinnerToken.adapter as? TokenAdapter
-            val defaultPaymentToken = TokenData.tokenList_sol.find { it.id == defaultPaymentTokenId }
+            val defaultPaymentToken = TokenData.tokenList.find { it.id == defaultPaymentTokenId }
             defaultPaymentToken?.let {
                 tokenAdapter?.let { adapter ->
                     spinnerToken.setSelection(adapter.getPosition(it))
@@ -779,7 +655,7 @@
             nfcAdapter?.disableReaderMode(this)
         }
         private fun updatePaymentInfo(paymentAddress: String, paymentAmount: Double, tokenName: String) {
-            val tokenItem = TokenData.tokenList_general.find { it.name == tokenName }
+            val tokenItem = TokenData.tokenList.find { it.name == tokenName }
 
             if (tokenItem != null) {
                 SolanaUtils.getTokenPriceInDollars(tokenItem) { priceInUSD ->
@@ -842,7 +718,7 @@
                     paymentAddress = paymentInfo[0]
                     paymentAmount = paymentInfo[1].toDoubleOrNull()
                     tokenId = paymentInfo[2].toIntOrNull()
-                    val tokenName = TokenData.tokenList_sol.find { it.id == tokenId }?.name
+                    val tokenName = TokenData.tokenList.find { it.id == tokenId }?.name
 
                     Log.d("MainActivity", "HCE message: $responseString")
                     runOnUiThread {
@@ -877,7 +753,7 @@
         ) {
             scope.launch {
                 withContext(Dispatchers.IO) {
-                    val token = TokenData.tokenList_sol.find { it.id == id }
+                    val token = TokenData.tokenList.find { it.id == id }
                     if (token == null) {
                         Log.e("MainActivity", "Token with ID $id not found.")
                         return@withContext // Exit the function if token is not found

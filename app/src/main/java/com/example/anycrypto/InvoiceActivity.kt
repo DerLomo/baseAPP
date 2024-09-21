@@ -79,13 +79,13 @@ class InvoiceActivity : Activity() {
 
         // Set up the token spinner
         val tokenAdapter = when (connectedNetwork) {
-            "Solana" -> TokenAdapter(this, TokenData.tokenList_sol)
-            "XMR" -> TokenAdapter(this, TokenData.tokenList_xmr)
-            else -> TokenAdapter(this, TokenData.tokenList_sol)
+            "0x89" -> TokenAdapter(this, TokenData.tokenList)
+            "0x1" -> TokenAdapter(this, TokenData.tokenList)
+            else -> TokenAdapter(this, TokenData.tokenList)
         }
         spinnerToken.adapter = tokenAdapter
         val defaultInvoiceTokenId = Preferences.getDefaultInvoiceTokenId(this)
-        val defaultInvoiceToken = TokenData.tokenList_sol.find { it.id == defaultInvoiceTokenId }
+        val defaultInvoiceToken = TokenData.tokenList.find { it.id == defaultInvoiceTokenId }
         defaultInvoiceToken?.let {
             spinnerToken.setSelection(tokenAdapter.getPosition(it))
         }

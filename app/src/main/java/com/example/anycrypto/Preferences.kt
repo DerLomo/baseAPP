@@ -59,7 +59,7 @@ class SetPreferencesActivity : AppCompatActivity() {
     }
 
     private fun setupSpinners() {
-        val tokenAdapter = MainActivity.TokenAdapter(this, TokenData.tokenList_sol)
+        val tokenAdapter = MainActivity.TokenAdapter(this, TokenData.tokenList)
 
         spinnerPaymentToken.adapter = tokenAdapter
         spinnerInvoiceToken.adapter = tokenAdapter
@@ -68,8 +68,8 @@ class SetPreferencesActivity : AppCompatActivity() {
         val defaultPaymentTokenId = Preferences.getDefaultPaymentTokenId(this)
         val defaultInvoiceTokenId = Preferences.getDefaultInvoiceTokenId(this)
 
-        val paymentTokenPosition = TokenData.tokenList_sol.indexOfFirst { it.id == defaultPaymentTokenId }
-        val invoiceTokenPosition = TokenData.tokenList_sol.indexOfFirst { it.id == defaultInvoiceTokenId }
+        val paymentTokenPosition = TokenData.tokenList.indexOfFirst { it.id == defaultPaymentTokenId }
+        val invoiceTokenPosition = TokenData.tokenList.indexOfFirst { it.id == defaultInvoiceTokenId }
 
         if (paymentTokenPosition != -1) spinnerPaymentToken.setSelection(paymentTokenPosition)
         if (invoiceTokenPosition != -1) spinnerInvoiceToken.setSelection(invoiceTokenPosition)

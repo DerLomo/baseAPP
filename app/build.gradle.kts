@@ -94,7 +94,7 @@ dependencies {
     //MWA
     implementation("com.solanamobile:mobile-wallet-adapter-clientlib-ktx:2.0.3")
     implementation("com.portto.solana:web3:0.1.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("org.bitcoinj:bitcoinj-core:0.16.2")
 
@@ -124,5 +124,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-analytics-ktx")
 
-
+    //metamask
+    implementation("io.metamask.androidsdk:metamask-android-sdk:0.6.5")
 }
