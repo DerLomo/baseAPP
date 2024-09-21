@@ -323,7 +323,6 @@ class InvoiceActivity : Activity() {
                 evmUtils.getTokenPriceInDollars(selectedToken) { price ->
                     callback(price)
                 }
-                Log.d("InvoiceActivity", "Using Solana")
             }
             else -> callback(null)
         }

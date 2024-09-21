@@ -44,43 +44,65 @@ class EVMUtils(context: Context) {
             }
         }
     }
+
     fun getTokenPriceInDollars(token: TokenData.TokenItem, callback: (Double?) -> Unit) {
-            val tokenAddress = token.mintAddress
-            val url = "$API_URL$tokenAddress"
-            val apiKey = BuildConfig.API1INCH
+        val tokenAddress = token.mintAddress
+        val apiKey = BuildConfig.API1INCH
+        val url = "$API_URL$tokenAddress"
 
+        Log.d("EVMUtils", "Fetching price for token: ${token.name}, address: $tokenAddress, chain: ${token.chain}")
+        Log.d("EVMUtils", "API URL: $url")
+        Log.d("EVMUtils", "Using API Key: $apiKey")
 
-            val client = OkHttpClient()
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("Authorization", "Bearer $apiKey")
-                .build()
+        // Check if the token is USDC and return 1.0 immediately
+        if (token.name.equals("USDC", ignoreCase = true)) {
+            Log.d("EVMUtils", "Token is USDC. Returning price 1.0")
+            callback(1.0)
+            return
+        }
 
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    e.printStackTrace()
-                    callback(null)  // Return null in case of error
-                }
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("Authorization", "Bearer $apiKey")
+            .build()
 
-                override fun onResponse(call: Call, response: Response) {
-                    response.use {
-                        if (!it.isSuccessful) {
-                            callback(null)
-                            return
-                        }
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("EVMUtils", "Error fetching token price: ${e.message}")
+                e.printStackTrace()
+                callback(null)  // Return null in case of error
+            }
 
-                        val responseBody = it.body?.string() ?: ""
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!it.isSuccessful) {
+                        Log.e("EVMUtils", "Unsuccessful response: ${response.code}")
+                        callback(null)
+                        return
+                    }
+
+                    val responseBody = it.body?.string() ?: ""
+                    Log.d("EVMUtils", "Response body: $responseBody")
+
+                    try {
                         val json = JSONObject(responseBody)
                         val price = json.optDouble(token.mintAddress, -1.0)
 
                         if (price != -1.0) {
+                            Log.d("EVMUtils", "Price found for token: $price")
                             callback(price)
                         } else {
+                            Log.w("EVMUtils", "Price not found for token with address: $tokenAddress")
                             callback(null)
                         }
+                    } catch (e: Exception) {
+                        Log.e("EVMUtils", "Error parsing JSON response: ${e.message}")
+                        callback(null)
                     }
                 }
-            })
+            }
+        })
     }
 
 

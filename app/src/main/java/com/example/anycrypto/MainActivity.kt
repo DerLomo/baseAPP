@@ -547,56 +547,36 @@
         private fun disconnectWallet() {
             scope.launch {
                 try {
-                    val result = walletAdapter.disconnect(activityResultSender)
+                    // Clear shared preferences
+                    val sharedPreferences = getSharedPreferences("wallet_prefs", Context.MODE_PRIVATE)
+                    with(sharedPreferences.edit()) {
+                        remove("auth_token")
+                        remove("user_address")
+                        remove("connectedNetwork")
+                        apply()
+                    }
 
-                    when (result) {
-                        is TransactionResult.Success -> {
-                            Log.d("MainActivity", "Successfully disconnected wallet")
+                    // Update the UI and variables to reflect the disconnected state
+                    authToken = ""
+                    userAddress = ""
+                    noWallet = true
+                    canTransact = false
 
-                            // Clear shared preferences
-                            val sharedPreferences = getSharedPreferences("wallet_prefs", Context.MODE_PRIVATE)
-                            with(sharedPreferences.edit()) {
-                                remove("auth_token")
-                                remove("user_address")
-                                remove("connectedNetwork")
-                                apply()
-                            }
+                    withContext(Dispatchers.Main) {
+                        PayButton.visibility = View.GONE
+                        declineButton.visibility = View.GONE
+                        spinnerToken.visibility = View.GONE
+                        findViewById<CardView>(R.id.paymentInfoCard).visibility = View.GONE
+                        findViewById<TextView>(R.id.userAddressTextView).text = ""
+                        connectWalletButton.visibility = View.VISIBLE
+                        cardLayout.visibility = View.GONE
 
-                            // Update the UI and variables to reflect the disconnected state
-                            authToken = ""
-                            userAddress = ""
-                            noWallet = true
-                            canTransact = false
-
-                            withContext(Dispatchers.Main) {
-                                PayButton.visibility = View.GONE
-                                declineButton.visibility = View.GONE
-                                spinnerToken.visibility = View.GONE
-                                findViewById<CardView>(R.id.paymentInfoCard).visibility = View.GONE
-                                findViewById<TextView>(R.id.userAddressTextView).text = ""
-                                connectWalletButton.visibility = View.VISIBLE
-                                cardLayout.visibility = View.GONE
-
-                                updateButton()
-                                val navigationView: NavigationView = findViewById(R.id.nav_view)
-                                updateMenuItemsVisibility(navigationView)
-                                navigationView.menu.clear() // Clear existing menu
-                                navigationView.inflateMenu(R.menu.drawer_menu) // Re-inflate the menu
-                                updateMenuItemsVisibility(navigationView)
-                            }
-                        }
-                        is TransactionResult.Failure -> {
-                            Log.e("MainActivity", "Failed to disconnect wallet: ${result}")
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(this@MainActivity, "Failed to disconnect wallet", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        is TransactionResult.NoWalletFound -> {
-                            Log.e("MainActivity", "No wallet found to disconnect")
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(this@MainActivity, "No wallet found to disconnect", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                        updateButton()
+                        val navigationView: NavigationView = findViewById(R.id.nav_view)
+                        updateMenuItemsVisibility(navigationView)
+                        navigationView.menu.clear() // Clear existing menu
+                        navigationView.inflateMenu(R.menu.drawer_menu) // Re-inflate the menu
+                        updateMenuItemsVisibility(navigationView)
                     }
                 } catch (e: Exception) {
                     Log.e("MainActivity", "Error disconnecting wallet: ${e.message}")
@@ -658,7 +638,7 @@
             val tokenItem = TokenData.tokenList.find { it.name == tokenName }
 
             if (tokenItem != null) {
-                SolanaUtils.getTokenPriceInDollars(tokenItem) { priceInUSD ->
+                evmUtils.getTokenPriceInDollars(tokenItem) { priceInUSD ->
                     if (priceInUSD != null) {
                         val calculateFiatValue = { convertedPrice: Double ->
                             val fiatValue = convertedPrice * paymentAmount
