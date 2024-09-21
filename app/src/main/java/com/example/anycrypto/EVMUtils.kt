@@ -8,12 +8,14 @@ import io.metamask.androidsdk.SDKOptions
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
+import java.math.BigInteger
 
 class EVMUtils(context: Context) {
     private val dappMetadata = DappMetadata("AnyCrypto", "https://www.anycrypto.com")
-    private val infuraAPIKey = "3a2cee4ee80f4387a1f2e10b0b0caaf5"
+    val infuraAPIKey = BuildConfig.INFRA
     private val readonlyRPCMap = emptyMap<String, String>()
     private val API_URL = "https://api.1inch.dev/price/v1.1/1/"
+    private val circleAPIKey = BuildConfig.CIRCLE_API_KEY
 
     val ethereum = Ethereum(context, dappMetadata, SDKOptions(infuraAPIKey, readonlyRPCMap))
 
@@ -43,6 +45,69 @@ class EVMUtils(context: Context) {
                 }
             }
         }
+    }
+
+    fun sendUSDC(
+        fromChainId: String,
+        toChainId: String,
+        amount: BigInteger,
+        recipient: String,
+        callback: (Result<String>) -> Unit
+    ) {
+        // 1. Initiate a transfer using Circle's CCTP endpoint
+        val url = "$API_URL/transfers"
+        val client = OkHttpClient()
+
+        val requestBody = JSONObject().apply {
+            put("sourceChainId", fromChainId)
+            put("destinationChainId", toChainId)
+            put("amount", amount.toString()) // Amount in smallest unit (wei)
+            put("recipient", recipient)
+            put("token", "USDC")
+        }
+
+        val request = Request.Builder()
+            .url(url)
+            .post(RequestBody.create(MediaType.get("application/json"), requestBody.toString()))
+            .addHeader("Authorization", "Bearer $circleAPIKey")
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("EVMUtils", "Error sending USDC: ${e.message}")
+                e.printStackTrace()
+                callback(Result.failure(Exception("Failed to send USDC: ${e.message}")))
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!it.isSuccessful) {
+                        Log.e("EVMUtils", "Error response from Circle CCTP: ${response.code}")
+                        callback(Result.failure(Exception("Circle CCTP failed with code: ${response.code}")))
+                        return
+                    }
+
+                    val responseBody = it.body?.string() ?: ""
+                    Log.d("EVMUtils", "Circle CCTP response: $responseBody")
+
+                    try {
+                        val json = JSONObject(responseBody)
+                        val transferId = json.optString("transferId", "")
+
+                        if (transferId.isNotEmpty()) {
+                            Log.d("EVMUtils", "USDC transfer initiated, transferId: $transferId")
+                            callback(Result.success(transferId))
+                        } else {
+                            Log.w("EVMUtils", "Failed to get transferId")
+                            callback(Result.failure(Exception("Invalid response, no transferId")))
+                        }
+                    } catch (e: Exception) {
+                        Log.e("EVMUtils", "Error parsing Circle CCTP response: ${e.message}")
+                        callback(Result.failure(Exception("JSON parsing error: ${e.message}")))
+                    }
+                }
+            }
+        })
     }
 
     fun getTokenPriceInDollars(token: TokenData.TokenItem, callback: (Double?) -> Unit) {

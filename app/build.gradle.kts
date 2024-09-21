@@ -15,6 +15,7 @@ if (localPropertiesFile.exists()) {
     localProperties.load(localPropertiesFile.inputStream())
 }
 val api1inch = localProperties.getProperty("API1INCH", "")
+val infra = localProperties.getProperty("INFRA", "")
 
 android {
     namespace = "com.tnd.anycrypto"
@@ -39,6 +40,7 @@ android {
         resConfigs("en")
 
         buildConfigField("String", "API1INCH", "\"${api1inch}\"")
+        buildConfigField("String", "INFRA", "\"${infra}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "HELIUS_API_KEY", "\"${localProperties.getProperty("HELIUS_API_KEY", "")}\"")
         //Only for Solana DappStore
