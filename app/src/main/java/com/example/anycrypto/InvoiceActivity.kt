@@ -39,11 +39,12 @@ class InvoiceActivity : Activity() {
     private var connectedNetwork: String? = null
     private var isUsingFiat = false
     private lateinit var switchCurrency: SwitchMaterial
-
+    private lateinit var evmUtils: EVMUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_invoice)
+        evmUtils = EVMUtils(this)
 
         editTextAddress = findViewById(R.id.editTextAddress)
         editTextAmount = findViewById(R.id.editTextAmount)
@@ -316,10 +317,10 @@ class InvoiceActivity : Activity() {
 
     private fun getPrice(selectedToken: TokenData.TokenItem, callback: (Double?) -> Unit) {
         Log.d("InvoiceActivity","Connected Network is: ${connectedNetwork}")
-        connectedNetwork = "Solana" // Tmp, fix while we are only in Solana
+        connectedNetwork = "0x89"
         when (connectedNetwork) {
-            "Solana" -> {
-                SolanaUtils.getTokenPriceInDollars(selectedToken) { price ->
+            "0x89" -> {
+                evmUtils.getTokenPriceInDollars(selectedToken) { price ->
                     callback(price)
                 }
                 Log.d("InvoiceActivity", "Using Solana")

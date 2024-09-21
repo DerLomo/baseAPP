@@ -5,12 +5,15 @@ import android.util.Log
 import io.metamask.androidsdk.Ethereum
 import io.metamask.androidsdk.DappMetadata
 import io.metamask.androidsdk.SDKOptions
-import io.metamask.androidsdk.EthereumRequest
+import okhttp3.*
+import org.json.JSONObject
+import java.io.IOException
 
 class EVMUtils(context: Context) {
     private val dappMetadata = DappMetadata("AnyCrypto", "https://www.anycrypto.com")
     private val infuraAPIKey = "3a2cee4ee80f4387a1f2e10b0b0caaf5"
     private val readonlyRPCMap = emptyMap<String, String>()
+    private val API_URL = "https://api.1inch.dev/price/v1.1/1/"
 
     val ethereum = Ethereum(context, dappMetadata, SDKOptions(infuraAPIKey, readonlyRPCMap))
 
@@ -19,8 +22,8 @@ class EVMUtils(context: Context) {
             when (result) {
                 is io.metamask.androidsdk.Result.Success.Items -> {
                     Log.d("EVMUtils", "Connected successfully, requesting accounts and chain")
-                    Log.d("PUTA","${result}")
-                    Log.d("PUTA II" ,"${ethereum.chainId}")
+                    Log.d("PUTA", "${result}")
+                    Log.d("PUTA II", "${ethereum.chainId}")
 
                     // Extract the address from the result
                     val address = result.value.firstOrNull() ?: ""
@@ -28,10 +31,12 @@ class EVMUtils(context: Context) {
                     // Return the connection details
                     callback(Result.success(MetaMaskConnection(address, ethereum.chainId)))
                 }
+
                 is io.metamask.androidsdk.Result.Error -> {
                     Log.e("EVMUtils", "Connection error: ${result.error.message}")
                     callback(Result.failure(Exception("Connection failed: ${result.error.message}")))
                 }
+
                 else -> {
                     Log.e("EVMUtils", "Unexpected result during connection")
                     callback(Result.failure(Exception("Unexpected result during connection")))
@@ -39,24 +44,45 @@ class EVMUtils(context: Context) {
             }
         }
     }
+    fun getTokenPriceInDollars(token: TokenData.TokenItem, callback: (Double?) -> Unit) {
+            val tokenAddress = token.mintAddress
+            val url = "$API_URL$tokenAddress"
+            val apiKey = BuildConfig.API1INCH
 
-    fun sendUSDC(toAddress: String, amount: Double, callback: (Result<String>) -> Unit) {
-        val from = ethereum.selectedAddress
-        // USDC contract address (this is for Ethereum mainnet, change if using a different network)
-        val usdcContractAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 
-        // Encode the transfer function call
-        val data = "0xa9059cbb" + // Method ID for "transfer(address,uint256)"
-                toAddress.substring(2).padStart(64, '0') + // Recipient address
-                amount.toString().padStart(64, '0') // Amount in hex
+            val client = OkHttpClient()
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer $apiKey")
+                .build()
 
-        val transactionParams = mapOf(
-            "from" to from,
-            "to" to usdcContractAddress,
-            "data" to data
-        )
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
+                    callback(null)  // Return null in case of error
+                }
 
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (!it.isSuccessful) {
+                            callback(null)
+                            return
+                        }
+
+                        val responseBody = it.body?.string() ?: ""
+                        val json = JSONObject(responseBody)
+                        val price = json.optDouble(token.mintAddress, -1.0)
+
+                        if (price != -1.0) {
+                            callback(price)
+                        } else {
+                            callback(null)
+                        }
+                    }
+                }
+            })
     }
+
 
     data class MetaMaskConnection(
         val address: String,

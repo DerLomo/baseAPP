@@ -14,6 +14,7 @@ val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localProperties.load(localPropertiesFile.inputStream())
 }
+val api1inch = localProperties.getProperty("API1INCH", "")
 
 android {
     namespace = "com.tnd.anycrypto"
@@ -34,9 +35,10 @@ android {
         minSdk = 28
         targetSdk = 34
         versionCode = 4
-        versionName = "1.4 Saga Phone"
+        versionName = "1"
         resConfigs("en")
 
+        buildConfigField("String", "API1INCH", "\"${api1inch}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "HELIUS_API_KEY", "\"${localProperties.getProperty("HELIUS_API_KEY", "")}\"")
         //Only for Solana DappStore
