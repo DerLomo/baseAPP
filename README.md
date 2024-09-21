@@ -26,8 +26,3 @@ The motivation behind TND is to address the limitations and fragmentation within
 **Prerequisites:** You will need an Android device with contactless/NFC support and the desired wallets to connect to.
 
 ---
-
-## More Info
-
-- **Website:** [TND Payments](https://www.tndpayments.com/)
-- **Twitter:** [TND Payments](https://twitter.com/TNDpayments)
